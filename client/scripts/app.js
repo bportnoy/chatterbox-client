@@ -18,7 +18,7 @@ var main = function(){
         data: options,
         success: function (data) {
           displayMessages(data);
-          // console.log(data);
+          console.log(data);
         },
         error: function (data) {
           // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -33,22 +33,25 @@ var main = function(){
     var messages = data.results;
 
     _.each(messages,function(value){
-      if (!value.username) value.username = "Anaughtymouse";
-      var $message = $('<li><a href="#" class="userNameLink">' + validator.escape(value.username) +
-        '</a>: "' +validator.escape(value.text)+'"</li>');
-      if (settings.friends.indexOf(value.username) > -1) {
-        $message.addClass('friend');
+      if (value.objectId !== settings.lastMessageReceived) {
+        if (!value.username) value.username = "Anaughtymouse";
+        var $message = $('<li><a href="#" class="userNameLink">' + validator.escape(value.username) +
+          '</a>: "' +validator.escape(value.text)+'"</li>');
+        if (settings.friends.indexOf(value.username) > -1) {
+          $message.addClass('friend');
+        }
+        $stream.prepend($message);
+        settings.lastMessageReceived = value.objectId;
       }
-      $stream.prepend($message);
     });
 
     $('.userNameLink').on('click', function() {
       settings.friends.push($(this).text());
     });
-    setTimeout(function(){getMessages(1)},1000);
+    timerID = setTimeout(function(){getMessages(1)},1000);
   };
 
-  var postMessage = function(name,message){
+  var postMessage = function(message){
     var data = {
       username: settings.username,
       text: message,
@@ -71,35 +74,38 @@ var main = function(){
   };
 
   var settings = {
-  friends: [],
-  roomName: 'lobby',
-  username: 'Anonymous'
+    friends: [],
+    roomName: 'lobby',
+    username: 'Anonymous',
+    lastMessageReceived: null,
+    timerID: null
   };
 
   var $send = $('#sendButton');
   var $box = $('#writeMessageBox');
   $send.on('click',function(){
     var input = $box.val();
-    postMessage("testname",input,"lobby");
+    postMessage(input);
     $box.val('');
   });
 
   $('#roomButton').on('click',function(){
-    var $box = $('#roomBox');
-    var input = $box.val();
+    var $roomBox = $('#roomBox');
+    var input = $roomBox.val();
+    clearTimeout(timerID);
     input = validator.escape(input);
     settings.roomName = input;
-    postMessage("testname",input,"lobby");
-    $('#roomName').text('You are in the ' +roomName);
+    $('#roomName').text('Curent room: ' + settings.roomName);
     $('#stream').empty();
-    $box.val('');
+    $roomBox.val('');
+    getMessages(10);
   });
 
-      // settings.friends = [];
-      var bar = window.location.search;
-      settings.username = bar.slice(bar.indexOf("=")+1);
-      $('#roomName').text('Current room: ' +settings.roomName);
-      getMessages(1);
+  var bar = window.location.search;
+  settings.username = bar.slice(bar.indexOf("=")+1);
+  $('#roomName').text('Current room: ' +settings.roomName);
+  getMessages(10);
+
 };
 
 $(document).ready(main);
