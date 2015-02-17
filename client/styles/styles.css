@@ -1,16 +1,14 @@
 body {
     background: #eee;
-    text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
 }
 
 #main {
-    width: 700px;
     margin: auto;
     text-align: left;
     background: white;
-    padding: 50px 60px;
+    padding: 10px;
     border: solid #ddd;
     border-width: 0 1px 1px 1px;
 }
@@ -94,9 +92,13 @@ form input[type=text] {
 
 #writeMessageBox {
     display: inline;
-    width: 82%;
+    width: 77%;
 }
 
 #sendMessageButton {
     display: inline;
+}
+
+.friend {
+    font-weight: bold;
 }
