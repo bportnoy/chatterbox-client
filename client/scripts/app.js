@@ -20,7 +20,8 @@ var getMessages = function(number){
     },
     error: function (data) {
       // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to receive message');
+      console.error('chatterbox: Failed to receive message,trying again...');
+      setTimeout(getMessages,2000);
     }
   });
 };
@@ -43,7 +44,7 @@ var displayOurMessage = function(text){
 
 var postMessage = function(name,message,room){
   var data = {
-    username: name,
+    username: window.username,
     text: message,
     roomname: room
   };
@@ -72,9 +73,13 @@ $(document).ready(function(){
     postMessage("testname",input,"lobby");
     $box.val('');
   });
+  var bar = window.location.search;
+  window.username = bar.slice(bar.indexOf("=")+1);
+  window.roomName = 'lobby';
+  $('#roomName').text('You are in the ' +roomName);
+  getMessages(1);
 });
 
-getMessages(1);
 
 
 //function: escape message content

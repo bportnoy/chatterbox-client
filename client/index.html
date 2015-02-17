@@ -15,20 +15,23 @@
     <script src="scripts/app.js"></script>
   </head>
   <body>
-    <div id="main">
-      <h1>chatterbox</h1>
-
-      <div id="input-msg">
-        <label for="writeMessageBox">Enter a message</label>
-        <input type="text" id="writeMessageBox" class="form-control" placeholder="Your message here...">
-        <button id="sendButton" class="btn btn-default" type="submit">Send</button>
+  <div class="row">
+    <div class="col-lg-9">
+      <div id="main">
+        <h1>chatterbox</h1>
+        <h3 id="roomName"></h3>
+        <div id="input-msg">
+          <label for="writeMessageBox">Enter a message</label>
+          <input type="text" id="writeMessageBox" class="form-control" placeholder="Your message here...">
+          <button id="sendButton" class="btn btn-default" type="submit">Send</button>
+        </div>
+        <ul id="stream"></ul>
       </div>
-
-
-
-
-      <ul id="stream"></ul>
-
     </div>
+    <div class="col-lg-3">
+    <h3>Other chat rooms</h3>
+    </div>
+  </div>
+
   </body>
 </html>
