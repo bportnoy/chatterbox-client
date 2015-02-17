@@ -92,7 +92,7 @@ form input[type=text] {
 
 #writeMessageBox {
     display: inline;
-    width: 77%;
+    width: 50%;
 }
 
 #sendMessageButton {
@@ -101,4 +101,12 @@ form input[type=text] {
 
 .friend {
     font-weight: bold;
+}
+
+.enc-off {
+    color: red;
+}
+
+.enc-on{
+    color: green;
 }

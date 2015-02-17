@@ -73,12 +73,18 @@ var main = function(){
     });
   };
 
+  var activateEncryption = function(passphrase){
+
+    $('#encryption').removeClass('enc-off').addClass('enc-on');
+  };
+
   var settings = {
     friends: [],
     roomName: 'lobby',
     username: 'Anonymous',
     lastMessageReceived: null,
-    timerID: null
+    timerID: null,
+    encryption: false
   };
 
   var $send = $('#sendButton');
@@ -101,10 +107,20 @@ var main = function(){
     getMessages(10);
   });
 
+  $('#encButton').on('click',function(){
+    var $encBox = $('#encBox');
+    var input = $encBox.val();
+    activateEncryption(input);
+    $encBox.val('');
+  });
+
   var bar = window.location.search;
   settings.username = bar.slice(bar.indexOf("=")+1);
   $('#roomName').text('Current room: ' +settings.roomName);
+  $('#encryption').text('off').addClass('enc-off');
   getMessages(10);
+
+
 
 };
 
