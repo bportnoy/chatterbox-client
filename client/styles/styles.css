@@ -6,7 +6,7 @@ body {
 }
 
 #main {
-    width: 500px;
+    width: 700px;
     margin: auto;
     text-align: left;
     background: white;
@@ -28,6 +28,11 @@ body {
 
 #main ul {
     padding-left: 20px;
+}
+
+#main li {
+    list-style: none;
+    margin-bottom: 10px;
 }
 
 #main .error {
@@ -81,4 +86,17 @@ form input[type=text] {
 
 .spinner img {
     padding: 10px;
+}
+
+#input-msg {
+    margin-bottom: 25px;
+}
+
+#writeMessageBox {
+    display: inline;
+    width: 82%;
+}
+
+#sendMessageButton {
+    display: inline;
 }
