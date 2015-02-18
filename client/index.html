@@ -21,24 +21,29 @@
         <h1>chatterbox</h1>
         <h3 id="roomName"></h3>
         <h3>Encryption: <span id="encryption"></span></h3>
-        <div id="input-msg">
-          <label for="writeMessageBox">Enter a message</label>
-          <input type="text" id="writeMessageBox" class="form-control" placeholder="Your message here...">
-          <button id="sendButton" class="btn btn-default" type="submit">Send</button>
+        <div>
+          <label for="message">Enter a message</label>
+          <form id="send">
+            <input type="text" id="message" class="form-control" placeholder="Your message here...">
+            <button class="btn btn-default submit" type="submit">Send</button>
+          </form>
         </div>
         <ul id="chats"></ul>
       </div>
     </div>
     <div class="col-lg-3">
     <h3 align='left'>Other Rooms</h3>
-    <div id="input-msg">
-      <label for="roomBox">Enter a room name</label>
+    <div>
+      <label for="roomBox">Enter a room name to add</label>
       <input type="text" id="roomBox" class="form-control" placeholder="Room name...">
       <button id="roomButton" class="btn btn-default" type="submit">Send</button>
     </div>
+    <div id="roomList">
+      <ul id="roomSelect"></ul>
+    </div>
     <div class="col-lg-3">
     </div>
-    <div id="input-msg">
+    <div>
       <label for="encBox">Enter a passphrase to enable encryption:</label>
       <input type="text" id="encBox" class="form-control" placeholder="Passphrase">
       <button id="encButton" class="btn btn-default" type="submit">Send</button>

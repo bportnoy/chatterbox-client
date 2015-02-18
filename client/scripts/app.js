@@ -39,7 +39,7 @@ app.addMessage = function(messages){
   _.each(messages,function(value){
     if (value.objectId !== app.settings.lastMessageReceived) {
       if (!value.username) value.username = "Anaughtymouse";
-      var $message = $('<li><a href="#" class="userNameLink">' + validator.escape(value.username) +
+      var $message = $('<li><a href="#" class="username">' + validator.escape(value.username) +
         '</a>: "' +validator.escape(value.text)+'"</li>');
       if (app.settings.friends.indexOf(value.username) > -1) {
         $message.addClass('friend');
@@ -49,8 +49,8 @@ app.addMessage = function(messages){
     }
   });
 
-  $('.userNameLink').on('click', function() {
-    this.settings.friends.push($(this).text());
+  $('.username').on('click', function() {
+    app.addFriend($(this).text());
   });
   timerID = setTimeout(function(){app.fetch(1)},1000);
 };
@@ -88,60 +88,72 @@ app.settings = {
   username: 'Anonymous',
   lastMessageReceived: null,
   timerID: null,
-  encryption: false
+  encryption: false,
+  rooms: ['lobby']
 };
 
 app.clearMessages = function(){
   $('#chats').empty();
-}
+};
+
+app.handleSubmit = function(){
+  var $box = $('#message');
+  var input = $box.val();
+  app.send({
+    username: app.settings.username,
+    text: input,
+    roomname: app.settings.roomName
+  });
+  $('#message').val('');
+};
 
 app.init = function(){
-  this.settings = {
-  friends: [],
-  roomName: 'lobby',
-  username: 'Anonymous',
-  lastMessageReceived: null,
-  timerID: null,
-  encryption: false
-  };
 
-  var $send = $('#sendButton');
-    var $box = $('#writeMessageBox');
-    $send.on('click',function(){
-      var input = $box.val();
-      app.send({
-        username: app.settings.username,
-        text: input,
-        roomname: app.settings.roomName
-      });
-      $box.val('');
-    });
+  var $send = $('#send');
+  $send.on('click',function(event){
+    event.preventDefault();
+    app.handleSubmit();
+  });
 
-    $('#roomButton').on('click',function(){
-      var $roomBox = $('#roomBox');
-      var input = $roomBox.val();
-      clearTimeout(timerID);
-      input = validator.escape(input);
-      app.settings.roomName = input;
-      $('#roomName').text('Curent room: ' + app.settings.roomName);
-      $('#chats').empty();
-      app.clearMessages();
-      app.fetch(10);
-    });
-
-    $('#encButton').on('click',function(){
-      var $encBox = $('#encBox');
-      var input = $encBox.val();
-      this.activateEncryption(input);
-      $encBox.val('');
-    });
-
-    var bar = window.location.search;
-    app.settings.username = bar.slice(bar.indexOf("=")+1);
-    $('#roomName').text('Current room: ' +app.settings.roomName);
-    $('#encryption').text('off').addClass('enc-off');
-    // console.log(this)
+  $('#roomButton').on('click',function(){
+    var $roomBox = $('#roomBox');
+    var input = $roomBox.val();
+    clearTimeout(timerID);
+    input = validator.escape(input);
+    app.addRoom(input);
+    app.changeRoom(input);
+    app.clearMessages();
     app.fetch(10);
+  });
+
+  $('#encButton').on('click',function(){
+    var $encBox = $('#encBox');
+    var input = $encBox.val();
+    this.activateEncryption(input);
+    $encBox.val('');
+  });
+
+  var bar = window.location.search;
+  app.settings.username = bar.slice(bar.indexOf("=")+1);
+  $('#roomName').text('Current room: ' +app.settings.roomName);
+  $('#encryption').text('off').addClass('enc-off');
+  // console.log(this)
+  app.fetch(10);
+};
+
+app.addRoom = function(name){
+  this.settings.rooms.push(name);
+  var $room = $('<li>' +validator.escape(name) + '</li>');
+  $('#roomSelect').append($room);
+};
+
+app.addFriend = function(name){
+  this.settings.friends.push(name);
+};
+
+app.changeRoom = function(name){
+  app.settings.roomName = name;
+  $('#roomName').text('Curent room: ' + app.settings.roomName);
 };
 
 $(document).ready(app.init);
