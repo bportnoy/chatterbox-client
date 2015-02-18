@@ -22,7 +22,7 @@ app.fetch = function(number){
       data: options,
       success: function (data) {
         app.addMessage(data.results);
-        console.log(data);
+        // console.log(data);
       },
       error: function (data) {
         // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -33,13 +33,18 @@ app.fetch = function(number){
   };
 
 app.addMessage = function(messages){
-  console.log(messages);
+  // console.log(messages);
   var $stream = $('#chats');
 
   _.each(messages,function(value){
     if (value.objectId !== app.settings.lastMessageReceived) {
+      console.log(value.encrypted);
+      if (value.crypto === true){
+        value.text = app.decrypt(value.text);
+      }
       if (!value.username) value.username = "Anaughtymouse";
-      var $message = $('<li><a href="#" class="username">' + validator.escape(value.username) +
+      var $message = $('<li><a href="#" class="username">' +
+        validator.escape(value.username) +
         '</a>: "' +validator.escape(value.text)+'"</li>');
       if (app.settings.friends.indexOf(value.username) > -1) {
         $message.addClass('friend');
@@ -65,6 +70,7 @@ app.send = function(message){
   //   text: message,
   //   roomname: this.settings.roomName
   // };
+  console.log(message);
   $.ajax({
     // always use this url
     url: 'https://api.parse.com/1/classes/chatterbox',
@@ -85,13 +91,21 @@ app.activateEncryption = function(){
   var $encBox = $('#encBox');
   var input = $encBox.val();
   app.settings.passphrase = input;
-  app.settings.encrytion = true;
+  app.settings.encryption = true;
   $encBox.val('');
-  $('#encryption').removeClass('enc-off').addClass('enc-on');
+  $('#encryption').removeClass('enc-off').addClass('enc-on').text('on');
 };
 
 app.encrypt = function(message){
-  // var encrypted
+  var encrypted = CryptoJS.AES.encrypt(message,app.settings.passphrase, { format: JSONFormatter });
+  // var encrypted = CryptoJS.AES.encrypt(message,app.settings.passphrase);
+  return encrypted.toString();
+};
+
+app.decrypt = function(message){
+  var decrypted = CryptoJS.AES.decrypt(message,app.settings.passphrase, { format: JSONFormatter });
+  console.log(decrypted);
+  return decrypted.toString(CryptoJS.enc.Utf8);
 };
 
 app.settings = {
@@ -112,10 +126,14 @@ app.clearMessages = function(){
 app.handleSubmit = function(){
   var $box = $('#message');
   var input = $box.val();
+  if (app.settings.encryption){
+    input = app.encrypt(input);
+  }
   app.send({
     username: app.settings.username,
     text: input,
-    roomname: app.settings.roomName
+    roomname: app.settings.roomName,
+    crypto: app.settings.encryption
   });
   $('#message').val('');
 };
@@ -123,7 +141,7 @@ app.handleSubmit = function(){
 app.init = function(){
 
   var $send = $('#send');
-  $send.on('click',function(event){
+  $send.on('submit',function(event){
     event.preventDefault();
     app.handleSubmit();
   });
@@ -139,7 +157,7 @@ app.init = function(){
     app.fetch(10);
   });
 
-  $('#encButton').on('submit',function(e){
+  $('#encForm').on('submit',function(e){
     e.preventDefault();
     app.activateEncryption();
   });
@@ -149,6 +167,9 @@ app.init = function(){
   $('#roomName').text('Current room: ' +app.settings.roomName);
   $('#encryption').text('off').addClass('enc-off');
   // console.log(this)
+
+  app.settings.passphrase = prompt('Enter your passphrase to access encrypted messages.') || '';
+  if (app.settings.passphrase !== '') app.settings.encryption = true;
   app.fetch(10);
 };
 
@@ -169,6 +190,46 @@ app.changeRoom = function(name){
 
 $(document).ready(app.init);
 
+//example JSON formatter from CryptoJS project
+var JSONFormatter = {
+        stringify: function (cipherParams) {
+            // create json object with ciphertext
+            var jsonObj = {
+                ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)
+            };
+
+            // optionally add iv and salt
+            if (cipherParams.iv) {
+                jsonObj.iv = cipherParams.iv.toString();
+            }
+            if (cipherParams.salt) {
+                jsonObj.s = cipherParams.salt.toString();
+            }
+
+            // stringify json object
+            return JSON.stringify(jsonObj);
+        },
+
+        parse: function (jsonStr) {
+            // parse json string
+            var jsonObj = JSON.parse(jsonStr);
+
+            // extract ciphertext from json object, and create cipher params object
+            var cipherParams = CryptoJS.lib.CipherParams.create({
+                ciphertext: CryptoJS.enc.Base64.parse(jsonObj.ct)
+            });
+
+            // optionally extract iv and salt
+            if (jsonObj.iv) {
+                cipherParams.iv = CryptoJS.enc.Hex.parse(jsonObj.iv)
+            }
+            if (jsonObj.s) {
+                cipherParams.salt = CryptoJS.enc.Hex.parse(jsonObj.s)
+            }
+
+            return cipherParams;
+        }
+    };
 
 
 //function: escape message content
