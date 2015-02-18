@@ -87,9 +87,9 @@ app.send = function(message){
   });
 };
 
-app.activateEncryption = function(){
+app.activateEncryption = function(input){
   var $encBox = $('#encBox');
-  var input = $encBox.val();
+  var input = input || $encBox.val();
   app.settings.passphrase = input;
   app.settings.encryption = true;
   $encBox.val('');
@@ -168,8 +168,8 @@ app.init = function(){
   $('#encryption').text('off').addClass('enc-off');
   // console.log(this)
 
-  app.settings.passphrase = prompt('Enter your passphrase to access encrypted messages.') || '';
-  if (app.settings.passphrase !== '') app.settings.encryption = true;
+  var initPhrase = prompt('Enter your passphrase to access encrypted messages.') || '';
+  if (initPhrase !== '') app.activateEncryption(initPhrase);
   app.fetch(10);
 };
 
