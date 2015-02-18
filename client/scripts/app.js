@@ -46,6 +46,10 @@ app.addMessage = function(messages){
       }
       $stream.prepend($message);
       app.settings.lastMessageReceived = value.objectId;
+      //let's keep the chat tidy
+      if ($stream.children().length > 20){
+        $stream.last().remove();
+      }
     }
   });
 
@@ -77,9 +81,17 @@ app.send = function(message){
   });
 };
 
-app.activateEncryption = function(passphrase){
-
+app.activateEncryption = function(){
+  var $encBox = $('#encBox');
+  var input = $encBox.val();
+  app.settings.passphrase = input;
+  app.settings.encrytion = true;
+  $encBox.val('');
   $('#encryption').removeClass('enc-off').addClass('enc-on');
+};
+
+app.encrypt = function(message){
+  // var encrypted
 };
 
 app.settings = {
@@ -89,7 +101,8 @@ app.settings = {
   lastMessageReceived: null,
   timerID: null,
   encryption: false,
-  rooms: ['lobby']
+  rooms: ['lobby'],
+  passphrase: ''
 };
 
 app.clearMessages = function(){
@@ -126,11 +139,9 @@ app.init = function(){
     app.fetch(10);
   });
 
-  $('#encButton').on('click',function(){
-    var $encBox = $('#encBox');
-    var input = $encBox.val();
-    this.activateEncryption(input);
-    $encBox.val('');
+  $('#encButton').on('submit',function(e){
+    e.preventDefault();
+    app.activateEncryption();
   });
 
   var bar = window.location.search;
@@ -142,13 +153,13 @@ app.init = function(){
 };
 
 app.addRoom = function(name){
-  this.settings.rooms.push(name);
+  app.settings.rooms.push(name);
   var $room = $('<li>' +validator.escape(name) + '</li>');
   $('#roomSelect').append($room);
 };
 
 app.addFriend = function(name){
-  this.settings.friends.push(name);
+  app.settings.friends.push(name);
 };
 
 app.changeRoom = function(name){
